@@ -1,8 +1,9 @@
+// import { startConfetti, stopConfetti, removeConfetti } from './confetti.js';
+
 const playerScoreEL = document.getElementById('playerScore');
 const playerChoiceEL = document.getElementById('playerChoice');
 const computerScoreEl = document.getElementById('computerScore');
 const computerChoiceEl = document.getElementById('computerChoice');
-const resultText = document.getElementById('resultText');
 
 const playerRock = document.getElementById('playerRock');
 const playerPaper = document.getElementById('playerPaper');
@@ -17,6 +18,7 @@ const computerLizard = document.getElementById('computerLizard');
 const computerSpock = document.getElementById('computerSpock');
 
 const allGameIcons = document.querySelectorAll('.far');
+const resultText = document.getElementById('resultText');
 
 const choices = {
   rock: { name: 'Rock', defeats: ['scissors', 'lizard'] },
@@ -30,14 +32,30 @@ let playerScoreNumber = 0;
 let computerScoreNumber =0;
 let computerChoice = '';
 
-// console.log(allGameIcons);
-
 // Reset all 'selected' icons
 function resetSelected() {
   allGameIcons.forEach((icon) => {
     icon.classList.remove('selected');
-  }); 
+  });
+  import('./confetti.js')
+    .then((module) => {
+      module.stopConfetti();
+      module.removeConfetti();
+    });
 }
+
+// ResetScore & playerChoice/computerChoice
+function resetAll()  {
+  playerScoreNumber = 0;
+  computerScoreNumber = 0;
+  playerScoreEL.textContent = playerScoreNumber;
+  computerScoreEl.textContent = computerScoreNumber;
+  playerChoiceEL.textContent = '';
+  computerChoiceEl.textContent = '';
+  resultText.textContent = '';
+  resetSelected();
+}
+window.resetAll = resetAll;
 
 // Random computer choice
 function computerRandomChoice() {
@@ -85,16 +103,18 @@ function displayComputerChoice() {
 
 // Check results, increase scores, update resultText
 function updateScore(playerChoice) {
-  console.log(playerChoice, computerChoice);
   if(playerChoice === computerChoice) {
     resultText.textContent = "It's a tie.";
   } else {
     const choice = choices[playerChoice];
-    console.log(choice.defeats.indexOf(computerChoice));
     if(choice.defeats.indexOf(computerChoice) > -1) {
-      resultText.textContent = "You Won!";
-      playerScoreNumber++;
-      playerScoreEL.textContent = playerScoreNumber;
+      import('./confetti.js')
+        .then((module) => {
+          module.startConfetti();
+          resultText.textContent = "You Won!";
+          playerScoreNumber++;
+          playerScoreEL.textContent = playerScoreNumber;
+        });
     } else {
       resultText.textContent = "You Lose!";
       computerScoreNumber++;
@@ -140,3 +160,7 @@ function select(playerChoice) {
       break;
   }
 }
+window.select = select;
+
+// On startup, set initial values
+resetAll();
